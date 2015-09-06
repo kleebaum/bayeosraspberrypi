@@ -64,7 +64,7 @@ def measure(seconds=10):
     slope = lin_model[0]
     intercept = lin_model[1]
     r_squared = lin_model[2]*lin_model[2]
-    slope_err = lin_model[5]
+    slope_err = lin_model[4]
     return [mean_temp, var_temp, mean_hum, var_hum, slope, intercept, r_squared, slope_err]
 
 sender.start() # starts sender in a concurrent thread
@@ -73,11 +73,11 @@ try:
     while True:
         for addr in range(1, 15):   # address 0 is reserved for flushing with air
             gpio.set_addr(0)        # set flushing address
-            sleep(0.6)              # flush for 60 seconds
+            sleep(60)              # flush for 60 seconds
             gpio.reset()            # stop flushing
     
             gpio.set_addr(addr)     # start measuring wait 60 seconds, 240 measure
-            writer.save(measure(3), origin="RaspberryPi Kammer Nr. " + str(addr))
+            writer.save(measure(30), origin="RaspberryPi Kammer Nr. " + str(addr))
             writer.flush()          # close the file in order to "feed" sender
             gpio.reset()
 except KeyboardInterrupt:

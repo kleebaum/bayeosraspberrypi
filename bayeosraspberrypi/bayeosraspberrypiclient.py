@@ -45,7 +45,7 @@ class RaspberryPiClient(BayEOSGatewayClient):
         """Overwrites the save_data() method of the BayEOSGatewayClient class."""
         self.writer.save(values, origin='RaspberryPi-Chamber-' + str(self.addr))
         self.writer.flush()
-        print 'save data ' + str(values)
+        print 'saved data: ' + str(values)
         
         self.addr += 1
         if self.addr > 15:
@@ -84,7 +84,7 @@ class RaspberryPiClient(BayEOSGatewayClient):
         slope = lin_model[0]
         intercept = lin_model[1]
         r_squared = lin_model[2]*lin_model[2]
-        slope_err = lin_model[5]
+        slope_err = lin_model[4]
         return [mean_temp, var_temp, mean_hum, var_hum, slope, intercept, r_squared, slope_err]
 
 OPTIONS = bayeos_confparser('../config/bayeosraspberrypi.ini')
