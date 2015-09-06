@@ -2,12 +2,13 @@
 A SHT21 sensor and a MCP3424 analog digital converter are connected to gpio pins, i.e. to the I2C bus.
 One BayEOSWriter and one BayEOSSender object is instantiated to transfer data to the BayEOSGateway.
 The sender runs in a separate thread. Origin frames are sent to distinguish CO2 chambers."""
+
 import sys, numpy  # apt-get install python-numpy
 from scipy import stats  # apt-get install python-scipy
+from time import sleep, time
 from thread import start_new_thread
 
 from bayeosgatewayclient import BayEOSWriter, BayEOSSender
-from time import sleep
 from i2c import I2C
 from sht21 import SHT21
 from mcp3424 import MCP3424
@@ -40,27 +41,29 @@ except IOError as err:
 
 # measurement method
 def measure(seconds=10):
+    """Measures temperature, humidity and CO2 concentration.
+    @param seconds: how long should be measured
+    @return statistically calculated parameters 
+    """
     measured_seconds = []
     temp = []
     hum = []
     co2 = []
+    start_time = time()
     for i in range(0, seconds):
-        temp.append(sht21.read_temperature())
-        hum.append(sht21.read_humidity())
-        co2.append(mcp3424.read_voltage(1))
-        measured_seconds.append(i)
-        sleep(1)
+        start_new_thread(temp.append, (sht21.read_temperature(),))
+        start_new_thread(hum.append, (sht21.read_humidity(),))
+        start_new_thread(co2.append, (mcp3424.read_voltage(1),))
+        measured_seconds.append(time())
+        sleep(start_time + i - time() + 1)
     mean_temp = numpy.mean(temp)
     var_temp = numpy.var(temp)
     mean_hum = numpy.mean(hum)
     var_hum = numpy.var(hum)
     slope, intercept, r_value, p_value, std_err = stats.linregress(measured_seconds, co2)
-    # print "Mean temp.: " + str(mean_temp) + " Variance: " + str(var_temp)
-    # print "Mean humidity: " + str(mean_hum) + " Variance: " + str(var_hum)
-    # print "Slope: " + str(slope)
     return [mean_temp, var_temp, mean_hum, var_hum, slope, intercept]
 
-start_new_thread(sender.run, ())
+sender.start() # starts sender in a concurrent thread
 
 try:
     while True:
@@ -73,7 +76,7 @@ try:
             writer.save(measure(3), origin="RaspberryPi Kammer Nr. " + str(addr))
             writer.flush()          # close the file in order to "feed" sender
             gpio.reset()
-except KeyboardInterrupt as err:
+except KeyboardInterrupt:
     print 'Stopped measurement loop.'
 finally:
     gpio.cleanup()
