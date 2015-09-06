@@ -11,7 +11,7 @@ setup(
     version='0.1.0',
     packages=['bayeosraspberrypi'],
     install_requires=['bayeosgatewayclient', 'smbus'],
-    data_files=[('config',['config/bayeosraspberrypi.ini'])],
+    #data_files=[('config',['config/bayeosraspberrypi.ini'])],
     description='An implementation for a real BayEOS Gateway Client.',
     author='Anja Kleebaum',
     author_email='Anja.Kleebaum@stmail.uni-bayreuth.de',
