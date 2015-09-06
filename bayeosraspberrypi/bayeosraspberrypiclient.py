@@ -75,13 +75,17 @@ class RaspberryPiClient(BayEOSGatewayClient):
             start_new_thread(hum.append, (self.sht21.read_humidity(),))
             start_new_thread(co2.append, (self.mcp3424.read_voltage(1),))
             measured_seconds.append(time())
-            sleep(start_time + i - time() + 1)
+            sleep(start_time + i - time() + 1) # to keep in time
         mean_temp = numpy.mean(temp)
         var_temp = numpy.var(temp)
         mean_hum = numpy.mean(hum)
         var_hum = numpy.var(hum)
-        slope, intercept, r_value, p_value, std_err = stats.linregress(measured_seconds, co2)
-        return [mean_temp, var_temp, mean_hum, var_hum, slope, intercept]
+        lin_model = stats.linregress(measured_seconds, co2)
+        slope = lin_model[0]
+        intercept = lin_model[1]
+        r_squared = lin_model[2]*lin_model[2]
+        slope_err = lin_model[5]
+        return [mean_temp, var_temp, mean_hum, var_hum, slope, intercept, r_squared, slope_err]
 
 OPTIONS = bayeos_confparser('../config/bayeosraspberrypi.ini')
 

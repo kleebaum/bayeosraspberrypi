@@ -1,5 +1,6 @@
 # bayeosraspberrypi
-An implementation for a real BayEOS Gateway Client.
+Python package to read sensor data using Raspberry Pi GPIO pins and 
+to transfer it to a BayEOS Gateway using the bayeosgatewayclient package.
 
 ## Installation
 First, you need to install the [bayeosgatewayclient](https://github.com/kleebaum/bayeosgatewayclient):
@@ -37,6 +38,7 @@ The script [bayeosraspberrypiclient.py](https://github.com/kleebaum/bayeosraspbe
 to extend the BayEOSGatewayClient class.
 
 For your own scripts:
+
 Import the RaspberryPiClient class: ```from bayeosraspberrypi import RaspberryPiClient```.
 
 Define options within the script:
